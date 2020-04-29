@@ -25,6 +25,7 @@ rules:
   - '4.3-art-latest'
   - '4.4-art-latest'
   - '4.5-art-latest'
+  - 'builder-base'
   verbs:
   - get
   - list
