@@ -153,6 +153,179 @@ periodics:
   cron: '@yearly'
   decorate: true
   labels:
+    job-env: osd-ephemeral
+    job-release: "4.1"
+    job-type: launch
+  name: release-openshift-origin-installer-launch-osd-ephemeral
+  spec:
+    containers:
+    - args:
+      - --artifact-dir=$(ARTIFACTS)
+      - --give-pr-author-access-to-namespace=true
+      - --image-import-pull-secret=/etc/pull-secret/.dockerconfigjson
+      - --input-hash=$(BUILD_ID)
+      - --input-hash=$(JOB_NAME)
+      - --kubeconfig=/etc/apici/kubeconfig
+      - --lease-server-password-file=/etc/boskos/password
+      - --lease-server-username=ci
+      - --namespace=$(NAMESPACE)
+      - --secret-dir=/usr/local/launch-cluster-profile
+      - --secret-dir=/usr/local/pull-secret
+      - --secret-dir=/usr/local/cluster-bot-aws-account-for-ephemeral-osd
+      - --secret-dir=/usr/local/cluster-bot-cloud-sso-for-ocm-ephemeral-osd
+      - --target=launch
+      - --template=/usr/local/launch
+      command:
+      - ci-operator
+      env:
+      - name: RELEASE_IMAGE_INITIAL
+      - name: RELEASE_IMAGE_LATEST
+      - name: CLUSTER_VARIANT
+      - name: CLUSTER_DURATION
+        value: "9000"
+      - name: COMPUTE_MACHINE_TYPE
+        value: m5.xlarge
+      - name: USER_ID
+        value: none
+      - name: COMPUTE_NODES
+        value: "2"
+      - name: BRANCH
+        value: "4.1"
+      - name: CLUSTER_TYPE
+        value: aws
+        #value: osd-ephemeral
+      - name: CONFIG_SPEC
+        value: |
+          base_images:
+            cli-ocm:
+              name: cli-ocm
+              namespace: ci
+              tag: latest
+          resources:
+            '*':
+              limits:
+                memory: 4Gi
+              requests:
+                cpu: 100m
+                memory: 200Mi
+          tag_specification:
+            name: "$(BRANCH)"
+            namespace: ocp
+          tests:
+          - as: launch
+            commands: |
+              set -e
+              HOME=/tmp
+              cd $HOME
+              CLUSTER_NAME=bot-$(USER_ID)
+              ocm login --url staging --client-id ocm-developer-productivity-staging --client-secret $(cat /tmp/sso-staging/token)
+              # TODO: change expiration of cluster according to CLUSTER_DURATION
+              ocm create cluster --aws-account-id $(cat /tmp/aws/AWS_ACCOUNT_ID) \
+                                 --aws-access-key-id $(cat /tmp/aws/AWS_ACCESS_KEY_ID) \
+                                 --aws-secret-access-key $(cat /tmp/aws/AWS_SECRET_ACCESS_KEY) \
+                                 --ccs $CLUSTER_NAME \
+                                 --compute-machine-type $(COMPUTE_MACHINE_TYPE) \
+                                 --compute-nodes $(COMPUTE_NODES) > /tmp/cluster_info
+              set -x
+              cat /tmp/cluster_info
+              CLUSTER_ID=$(cat /tmp/cluster_info | grep '^ID:' | tr -d '[:space:]' | cut -d ':' -f 2)
+              for i in {1..60}; do
+                sleep 60
+                CLUSTER_STATE=$(ocm cluster status $CLUSTER_ID | grep 'State:' | tr -d '[:space:]' | cut -d ':' -f 2)
+                echo "Cluster state: $CLUSTER_STATE"
+                if [[ "$CLUSTER_STATE" == "ready" ]]; then
+                  echo "Cluster is reported as ready"
+                  break
+                fi
+                if [[ "$CLUSTER_STATE" != "installing" || "$CLUSTER_STATE" != "pending" ]]; then
+                  echo "Cluster in invalid state: $CLUSTER_STATE"
+                  exit 1
+                fi
+              done
+              ocm get /api/clusters_mgmt/v1/clusters/$CLUSTER_ID/credentials | ./jq -r .kubeconfig > /tmp/admin.kubeconfig
+              while true; do
+                # If status fails three times, assume the cluster is gone and set -x will terminate the script.
+                ocm cluster status $CLUSTER_ID || ocm cluster status $CLUSTER_ID || ocm cluster status $CLUSTER_ID
+                sleep 10m
+              done
+            container:
+              from: cli-ocm
+            secrets:
+            - mount_path: /tmp/sso-staging
+              name: cluster-bot-cloud-sso-for-ocm-ephemeral-osd
+            - mount_path: /tmp/aws
+              name: cluster-bot-aws-account-for-ephemeral-osd
+      - name: JOB_NAME_SAFE
+        value: launch
+      - name: TEST_COMMAND
+        value: sleep $(CLUSTER_DURATION) & wait
+      - name: NAMESPACE
+      image: ci-operator:latest
+      imagePullPolicy: Always
+      name: ""
+      resources:
+        requests:
+          cpu: 10m
+      volumeMounts:
+      - mountPath: /etc/apici
+        name: apici-ci-operator-credentials
+        readOnly: true
+      - mountPath: /etc/boskos
+        name: boskos
+        readOnly: true
+      - mountPath: /usr/local/launch-cluster-profile
+        name: cluster-profile
+      - mountPath: /usr/local/launch
+        name: job-definition
+        subPath: cluster-launch-installer-e2e.yaml
+      - mountPath: /etc/pull-secret
+        name: pull-secret
+        readOnly: true
+      - mountPath: /usr/local/pull-secret
+        name: release-pull-secret
+      - mountPath: /usr/local/cluster-bot-cloud-sso-for-ocm-ephemeral-osd
+        name: cluster-bot-cloud-sso-for-ocm-ephemeral-osd
+      - mountPath: /usr/local/cluster-bot-aws-account-for-ephemeral-osd
+        name: cluster-bot-aws-account-for-ephemeral-osd
+    serviceAccountName: ci-operator
+    volumes:
+    - name: apici-ci-operator-credentials
+      secret:
+        items:
+        - key: sa.ci-operator.apici.config
+          path: kubeconfig
+        secretName: apici-ci-operator-credentials
+    - name: boskos
+      secret:
+        items:
+        - key: password
+          path: password
+        secretName: boskos-credentials
+    - name: cluster-profile
+      projected:
+        sources:
+        - secret:
+            name: cluster-secrets-aws
+    - configMap:
+        name: prow-job-cluster-launch-installer-e2e
+      name: job-definition
+    - name: pull-secret
+      secret:
+        secretName: registry-pull-credentials
+    - name: release-pull-secret
+      secret:
+        secretName: ci-pull-credentials
+    - name: cluster-bot-aws-account-for-ephemeral-osd
+      secret:
+        secretName: cluster-bot-aws-account-for-ephemeral-osd
+    - name: cluster-bot-cloud-sso-for-ocm-ephemeral-osd
+      secret:
+        secretName: cluster-bot-cloud-sso-for-ocm-ephemeral-osd
+- agent: kubernetes
+  cluster: api.ci
+  cron: '@yearly'
+  decorate: true
+  labels:
     job-env: aws
     job-release: "4.1"
     job-type: launch
