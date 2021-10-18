@@ -1,0 +1,38 @@
+{
+  "zz_generated_metadata": {
+    "org": "openshift",
+    "repo": "release",
+    "branch": "master"
+  },
+  "build_root": {
+    "image_stream_tag": {
+      "namespace": "openshift",
+      "name": "release",
+      "tag": "golang-1.12"
+    }
+  },
+  "tests": [
+    {
+      "as": "core-valid",
+      "commands": "make check-core",
+      "container": {
+        "from": "src"
+      }
+    },
+    {
+      "as": "services-valid",
+      "commands": "make check-services",
+      "container": {
+        "from": "src"
+      }
+    }
+  ],
+  "resources": {
+    "*": {
+      "requests": {
+        "cpu": "100m",
+        "memory": "200Mi"
+      }
+    }
+  }
+}
