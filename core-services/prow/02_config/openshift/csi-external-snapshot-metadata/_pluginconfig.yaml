@@ -7,7 +7,10 @@ label:
   restricted_labels:
     openshift/csi-external-snapshot-metadata:
     - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
       - openshift-staff-engineers
+      - openshift-sustaining-engineers
       allowed_users:
       - dobsonj
       - jsafrane
@@ -16,15 +19,6 @@ label:
       - tsmetana
       - mpatlasov
       label: backport-risk-assessed
-    - allowed_users:
-      - radeore
-      - chao007
-      - duanwei33
-      - Phaow
-      assign_on:
-      - label: backport-risk-assessed
-      - label: lgtm
-      label: cherry-pick-approved
 lgtm:
 - repos:
   - openshift/csi-external-snapshot-metadata

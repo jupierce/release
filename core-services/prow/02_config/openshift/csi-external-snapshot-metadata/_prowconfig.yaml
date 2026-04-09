@@ -5,7 +5,6 @@ tide:
     - release-4.22
     labels:
     - approved
-    - cherry-pick-approved
     - jira/valid-bug
     - jira/valid-reference
     - lgtm

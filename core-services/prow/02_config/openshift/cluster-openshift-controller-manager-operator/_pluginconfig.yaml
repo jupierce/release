@@ -1,7 +1,12 @@
 label:
   restricted_labels:
     openshift/cluster-openshift-controller-manager-operator:
-    - allowed_users:
+    - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
+      - openshift-staff-engineers
+      - openshift-sustaining-engineers
+      allowed_users:
       - adambkaplan
       - apoorvajagtap
       - sayan-biswas

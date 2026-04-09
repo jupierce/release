@@ -6,7 +6,12 @@ approve:
 label:
   restricted_labels:
     openshift/metallb:
-    - allowed_users:
+    - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
+      - openshift-staff-engineers
+      - openshift-sustaining-engineers
+      allowed_users:
       - russellb
       - fedepaol
       - msherif1234

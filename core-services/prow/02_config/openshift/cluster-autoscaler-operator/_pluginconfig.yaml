@@ -8,6 +8,10 @@ label:
   restricted_labels:
     openshift/cluster-autoscaler-operator:
     - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
+      - openshift-staff-engineers
+      - openshift-sustaining-engineers
       - openshift-team-cloud
       allowed_users:
       - elmiko

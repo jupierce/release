@@ -7,6 +7,10 @@ label:
   restricted_labels:
     openshift/azure-service-operator:
     - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
+      - openshift-staff-engineers
+      - openshift-sustaining-engineers
       - openshift-team-cloud
       label: backport-risk-assessed
     - allowed_users:

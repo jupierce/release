@@ -7,7 +7,12 @@ label:
       - xingxingxia
       - gangwgr
       label: cherry-pick-approved
-    - allowed_users:
+    - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
+      - openshift-staff-engineers
+      - openshift-sustaining-engineers
+      allowed_users:
       - ingvagabund
       - tkashem
       - p0lyn0mial

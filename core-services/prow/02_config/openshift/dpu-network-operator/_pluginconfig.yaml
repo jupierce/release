@@ -7,6 +7,10 @@ label:
   restricted_labels:
     openshift/dpu-network-operator:
     - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
+      - openshift-staff-engineers
+      - openshift-sustaining-engineers
       - team-multus-cni-maintainers
       allowed_users:
       - bn222

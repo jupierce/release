@@ -24,7 +24,10 @@ label:
       - Xia-Zhao-rh
       label: cherry-pick-approved
     - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
       - openshift-staff-engineers
+      - openshift-sustaining-engineers
       allowed_users:
       - kevinrizza
       - perdasilva

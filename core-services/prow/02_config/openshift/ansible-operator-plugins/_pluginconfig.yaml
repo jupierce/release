@@ -14,7 +14,10 @@ label:
       - label: backport-risk-assessed
       label: cherry-pick-approved
     - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
       - openshift-staff-engineers
+      - openshift-sustaining-engineers
       allowed_users:
       - joelanford
       - everettraven

@@ -32,7 +32,12 @@ external_plugins:
 label:
   restricted_labels:
     redhat-cne/cloud-event-proxy:
-    - allowed_users:
+    - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
+      - openshift-staff-engineers
+      - openshift-sustaining-engineers
+      allowed_users:
       - aneeshkp
       - edcdavid
       - nocturnalastro

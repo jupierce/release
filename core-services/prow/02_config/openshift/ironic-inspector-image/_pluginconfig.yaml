@@ -7,7 +7,10 @@ label:
   restricted_labels:
     openshift/ironic-inspector-image:
     - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
       - openshift-staff-engineers
+      - openshift-sustaining-engineers
       allowed_users:
       - elfosardo
       - dtantsur

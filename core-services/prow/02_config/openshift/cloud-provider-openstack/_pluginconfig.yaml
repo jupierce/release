@@ -2,7 +2,10 @@ label:
   restricted_labels:
     openshift/cloud-provider-openstack:
     - allowed_teams:
+      - openshift-patch-managers
+      - openshift-release-oversight
       - openshift-staff-engineers
+      - openshift-sustaining-engineers
       allowed_users:
       - mandre
       - mdbooth

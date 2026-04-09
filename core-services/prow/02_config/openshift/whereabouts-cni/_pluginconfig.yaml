@@ -18,8 +18,11 @@ label:
       - label: backport-risk-assessed
       label: cherry-pick-approved
     - allowed_teams:
-      - team-multus-cni-maintainers
+      - openshift-patch-managers
+      - openshift-release-oversight
       - openshift-staff-engineers
+      - openshift-sustaining-engineers
+      - team-multus-cni-maintainers
       allowed_users:
       - maiqueb
       - bpickard22

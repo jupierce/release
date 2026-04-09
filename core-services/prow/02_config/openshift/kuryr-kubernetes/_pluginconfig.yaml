@@ -3,6 +3,10 @@ label:
     openshift/kuryr-kubernetes:
     - allowed_teams:
       - kuryr-kubernetes
+      - openshift-patch-managers
+      - openshift-release-oversight
+      - openshift-staff-engineers
+      - openshift-sustaining-engineers
       label: backport-risk-assessed
     - allowed_users:
       - itzikb-redhat
